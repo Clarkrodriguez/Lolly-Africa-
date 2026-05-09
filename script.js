@@ -1,5 +1,5 @@
 // === CONFIG ===
-const WHATSAPP_NUMBER = "2349132689706"; // Lolly Africa WhatsApp
+const WHATSAPP_NUMBER = "2349132689706"  "2348116271663"; // Lolly Africa WhatsApp
 const STORAGE_KEY = "lolly_cart_v1";
 
 // === PRODUCTS ===
