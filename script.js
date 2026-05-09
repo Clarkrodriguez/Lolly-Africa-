@@ -26,6 +26,8 @@ const products = [
   { id: 20, name: "Agege Bread",             unit: "Family",  price: 1500,  emoji: "🍞", cat: "bakery" },
   { id: 21, name: "Sliced Wheat Loaf",       unit: "700g",    price: 2200,  emoji: "🥖", cat: "bakery" },
   { id: 22, name: "Meat Pie",                unit: "Pack of 4", price: 2800, emoji: "🥟", cat: "bakery" },
+ { id: 23, name: "Doughnut",                unit: "Pack of 6", price: 3000, emoji: "🍩", cat: "bakery" },
+
 ];
 
 // === STATE ===
