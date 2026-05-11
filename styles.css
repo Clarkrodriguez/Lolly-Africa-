@@ -46,7 +46,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .logo-fallback.light{color:#fff;-webkit-background-clip:initial;background-clip:initial;background:none}
-.logo-footer .logo-img{height:38px;filter:brightness(0) invert(1)}
+.logo-footer .logo-img{height:400px;filter:brightness(0) invert(1)}
 .nav-links{display:none;gap:30px}
 .nav-links a{color:var(--muted);font-weight:500;transition:color .2s}
 .nav-links a:hover{color:var(--primary)}
