@@ -1,0 +1,361 @@
+// ============================================================
+// LOLLY AFRICA
+// ============================================================
+
+const WHATSAPP_NUMBER = "2349132689706";
+const STORAGE_KEY = "lolly_cart_v1";
+const CUSTOMER_KEY = "lolly_customer_v1";
+
+// === PRODUCTS (add `desc` for richer detail view) ===
+const products = [
+  { id: 1,  name: "Premium Long Grain Rice", unit: "5kg bag", price: 12500, emoji: "🍚", cat: "grains", tag: "Bestseller", desc: "Premium parboiled long-grain rice. Cooks evenly, perfect for jollof, fried rice and party servings." },
+  { id: 2,  name: "Local Brown Beans",       unit: "2kg",     price: 4800,  emoji: "🫘", cat: "grains", desc: "Sweet brown beans, hand-cleaned and ready to cook. Great for moi moi, akara and porridge." },
+  { id: 3,  name: "Garri Ijebu",             unit: "4 cups",  price: 2200,  emoji: "🥣", cat: "grains", desc: "Authentic Ijebu garri — sour, fine and crunchy. Perfect for soaking or eba." },
+  { id: 4,  name: "Yellow Garri",            unit: "4 cups",  price: 2000,  emoji: "🥣", cat: "grains", desc: "Smooth yellow garri made from fresh cassava. Ideal for eba and snacks." },
+  { id: 5,  name: "Pure Palm Oil",           unit: "5 litres",price: 9500,  emoji: "🛢️", cat: "oils", tag: "Fresh", desc: "100% pure unadulterated palm oil. Rich red colour, traditional taste." },
+  { id: 6,  name: "Groundnut Oil",           unit: "5 litres",price: 11000, emoji: "🫗", cat: "oils", desc: "Cold-pressed groundnut oil — clean, light and great for frying." },
+  { id: 7,  name: "Dried Pepper (Ata Gungun)", unit: "500g", price: 3500,  emoji: "🌶️", cat: "oils", desc: "Sun-dried ground pepper with smoky aroma. Add heat to stews and soups." },
+  { id: 8,  name: "Curry & Thyme Pack",      unit: "Combo",   price: 1500,  emoji: "🧂", cat: "oils", desc: "Essential seasoning combo: curry powder + thyme. Every Nigerian kitchen staple." },
+  { id: 9,  name: "Fresh Tomatoes",          unit: "Basket",  price: 4500,  emoji: "🍅", cat: "fresh", desc: "Sun-ripened farm tomatoes, freshly picked and delivered the same day." },
+  { id: 10, name: "Sweet Plantain",          unit: "Bunch",   price: 3000,  emoji: "🍌", cat: "fresh", desc: "Ripe sweet plantains, perfect for dodo, boli or plantain chips." },
+  { id: 11, name: "Ugu (Pumpkin Leaves)",    unit: "Bundle",  price: 1200,  emoji: "🥬", cat: "fresh", desc: "Crisp green ugu leaves, washed and ready for egusi or vegetable soup." },
+  { id: 12, name: "Fresh Pepper Mix",        unit: "1kg",     price: 2500,  emoji: "🌶️", cat: "fresh", desc: "Tatashe + rodo + tomato mix — the classic stew base." },
+  { id: 13, name: "Frozen Chicken",          unit: "1kg",     price: 5500,  emoji: "🍗", cat: "protein", tag: "New", desc: "Clean, properly frozen chicken cuts. Hygienically packed." },
+  { id: 14, name: "Smoked Catfish",          unit: "Medium",  price: 3800,  emoji: "🐟", cat: "protein", desc: "Slow-smoked catfish for peppersoup, banga or stew. Deep, smoky flavour." },
+  { id: 15, name: "Crate of Eggs",           unit: "30 pcs",  price: 6500,  emoji: "🥚", cat: "protein", desc: "Farm-fresh large eggs. Carefully packed to prevent breakage." },
+  { id: 16, name: "Beef (Fresh Cut)",        unit: "1kg",     price: 7000,  emoji: "🥩", cat: "protein", desc: "Tender fresh beef, butcher-cut and cleaned. Perfect for stew or peppersoup." },
+  { id: 17, name: "Plantain Chips",          unit: "Pack",    price: 800,   emoji: "🍟", cat: "snacks", desc: "Crunchy salted plantain chips. Light, addictive snack." },
+  { id: 18, name: "Chapman Drink",           unit: "1 litre", price: 1800,  emoji: "🥤", cat: "snacks", desc: "Refreshing classic Nigerian Chapman with fruit notes. Chilled and ready." },
+  { id: 19, name: "Zobo Drink",              unit: "1 litre", price: 1500,  emoji: "🍹", cat: "snacks", desc: "Hibiscus zobo with ginger and pineapple — naturally caffeine free." },
+  { id: 20, name: "Agege Bread",             unit: "Family",  price: 1500,  emoji: "🍞", cat: "bakery", desc: "Soft, sweet Agege bread. Best enjoyed with butter, akara or stew." },
+  { id: 21, name: "Sliced Wheat Loaf",       unit: "700g",    price: 2200,  emoji: "🥖", cat: "bakery", desc: "Healthy whole-wheat loaf, freshly sliced." },
+  { id: 22, name: "Meat Pie",                unit: "Pack of 4", price: 2800, emoji: "🥟", cat: "bakery", desc: "Buttery meat pies stuffed with seasoned beef and potatoes." },
+];
+
+// === STATE ===
+let cart = loadCart();
+let activeCat = "all";
+let searchTerm = "";
+
+function loadCart(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch{return[]} }
+function saveCart(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)) }
+function fmt(n){ return "₦" + n.toLocaleString("en-NG") }
+function findProduct(id){ return products.find(p => p.id === id) }
+
+// === RENDER PRODUCTS ===
+const grid = document.getElementById("productGrid");
+function renderProducts(){
+  const list = activeCat === "all" ? products : products.filter(p => p.cat === activeCat);
+  grid.innerHTML = list.map(p => `
+    <article class="card" data-product="${p.id}">
+      <div class="card-img">
+        ${p.tag ? `<span class="card-tag">${p.tag}</span>` : ""}
+        ${p.image ? `<img src="${p.image}" alt="${p.name}" class="product-photo" loading="lazy">` : `<span class="emoji">${p.emoji}</span>`}
+      </div>
+      <div class="card-body">
+        <div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-unit">${p.unit}</div>
+        </div>
+        <div class="card-foot">
+          <span class="card-price">${fmt(p.price)}</span>
+          <button class="add-btn" data-add="${p.id}" aria-label="Add ${p.name}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  grid.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("[data-add]")) return;
+      openProductModal(+card.dataset.product);
+    });
+  });
+  grid.querySelectorAll("[data-add]").forEach(b => {
+    b.addEventListener("click", (e) => { e.stopPropagation(); addToCart(+b.dataset.add); });
+  });
+}
+
+// === SEARCH POPUP ===
+const searchToggle = document.getElementById("searchToggle");
+const searchPopup = document.getElementById("searchPopup");
+const searchInput = document.getElementById("searchInput");
+const searchClose = document.getElementById("searchClose");
+const searchResults = document.getElementById("searchResults");
+
+function openSearch(){
+  searchPopup.hidden = false;
+  searchToggle.setAttribute("aria-expanded", "true");
+  setTimeout(()=>searchInput.focus(), 50);
+  renderSearch();
+}
+function closeSearch(){
+  searchPopup.hidden = true;
+  searchToggle.setAttribute("aria-expanded", "false");
+  searchInput.value = "";
+  searchTerm = "";
+}
+function renderSearch(){
+  const q = searchTerm.trim().toLowerCase();
+  if (!q){
+    searchResults.innerHTML = `<div class="search-hint">Start typing to find products…</div>`;
+    return;
+  }
+  const matches = products.filter(p =>
+    p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)
+  );
+  if (!matches.length){
+    searchResults.innerHTML = `<div class="search-empty"><strong>No matches</strong>Try a different word, e.g. "rice" or "oil".</div>`;
+    return;
+  }
+  searchResults.innerHTML = matches.slice(0, 10).map(p => `
+    <button class="search-result" data-open="${p.id}">
+      <span class="search-result-img">${p.image ? `<img src="${p.image}" alt="">` : p.emoji}</span>
+      <span class="search-result-info">
+        <span class="search-result-name">${p.name}</span>
+        <span class="search-result-unit">${p.unit}</span>
+      </span>
+      <span class="search-result-price">${fmt(p.price)}</span>
+    </button>
+  `).join("");
+  searchResults.querySelectorAll("[data-open]").forEach(b => {
+    b.onclick = () => { const id = +b.dataset.open; closeSearch(); openProductModal(id); };
+  });
+}
+searchToggle.addEventListener("click", () => {
+  if (searchPopup.hidden) openSearch(); else closeSearch();
+});
+searchClose.addEventListener("click", closeSearch);
+searchInput.addEventListener("input", () => { searchTerm = searchInput.value; renderSearch(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !searchPopup.hidden) closeSearch(); });
+document.addEventListener("click", (e) => {
+  if (searchPopup.hidden) return;
+  if (!searchPopup.contains(e.target) && !searchToggle.contains(e.target)) closeSearch();
+});
+
+// === CATEGORY FILTER ===
+document.querySelectorAll(".chip").forEach(c => {
+  c.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
+    c.classList.add("active");
+    activeCat = c.dataset.cat;
+    renderProducts();
+  });
+});
+
+// === CART LOGIC ===
+function addToCart(id, qty = 1){
+  const item = cart.find(i => i.id === id);
+  if (item) item.qty += qty;
+  else cart.push({ id, qty });
+  saveCart(); renderCart();
+  showToast(`${findProduct(id).name} added to cart`);
+}
+function setQty(id, qty){
+  qty = Math.max(0, Math.min(999, Math.floor(qty || 0)));
+  if (qty === 0) { cart = cart.filter(i => i.id !== id); }
+  else {
+    const item = cart.find(i => i.id === id);
+    if (item) item.qty = qty;
+    else cart.push({ id, qty });
+  }
+  saveCart(); renderCart();
+}
+function changeQty(id, delta){
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
+  setQty(id, item.qty + delta);
+}
+function removeFromCart(id){ cart = cart.filter(i => i.id !== id); saveCart(); renderCart(); }
+
+// === RENDER CART ===
+const cartItemsEl = document.getElementById("cartItems");
+const cartEmptyEl = document.getElementById("cartEmpty");
+const cartFootEl  = document.getElementById("cartFoot");
+const cartCountEl = document.getElementById("cartCount");
+const cartTotalEl = document.getElementById("cartTotal");
+
+function cartTotal(){
+  return cart.reduce((s, c) => { const p = findProduct(c.id); return s + (p ? p.price * c.qty : 0); }, 0);
+}
+
+function renderCart(){
+  const items = cart.map(c => ({ ...c, ...findProduct(c.id) })).filter(i => i.name);
+  const totalQty = items.reduce((s,i) => s + i.qty, 0);
+  const total = cartTotal();
+  cartCountEl.textContent = totalQty;
+  cartCountEl.style.display = totalQty ? "grid" : "none";
+  cartTotalEl.textContent = fmt(total);
+
+  if (!items.length){
+    cartItemsEl.style.display = "none";
+    cartFootEl.style.display = "none";
+    cartEmptyEl.style.display = "flex";
+    return;
+  }
+  cartItemsEl.style.display = "flex";
+  cartFootEl.style.display = "block";
+  cartEmptyEl.style.display = "none";
+
+  cartItemsEl.innerHTML = items.map(i => `
+    <div class="cart-item">
+      <div class="cart-item-img">${i.image ? `<img src="${i.image}" alt="">` : i.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${i.name}</div>
+        <div class="cart-item-price">${fmt(i.price * i.qty)}</div>
+        <div class="cart-item-row">
+          <div class="qty">
+            <button data-dec="${i.id}" aria-label="Decrease">−</button>
+            <input class="qty-input" type="number" min="0" max="999" value="${i.qty}" data-qty="${i.id}" aria-label="Quantity" />
+            <button data-inc="${i.id}" aria-label="Increase">+</button>
+          </div>
+          <button class="remove" data-rm="${i.id}">Remove</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  cartItemsEl.querySelectorAll("[data-inc]").forEach(b => b.onclick = () => changeQty(+b.dataset.inc, 1));
+  cartItemsEl.querySelectorAll("[data-dec]").forEach(b => b.onclick = () => changeQty(+b.dataset.dec, -1));
+  cartItemsEl.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => removeFromCart(+b.dataset.rm));
+  cartItemsEl.querySelectorAll("[data-qty]").forEach(inp => {
+    inp.addEventListener("change", () => setQty(+inp.dataset.qty, parseInt(inp.value, 10)));
+    inp.addEventListener("focus", () => inp.select());
+  });
+}
+
+// === PRODUCT DETAIL MODAL ===
+const productOverlay = document.getElementById("productOverlay");
+const productBody = document.getElementById("productModalBody");
+
+function openProductModal(id){
+  const p = findProduct(id); if (!p) return;
+  const inCart = cart.find(i => i.id === id);
+  let qty = inCart ? inCart.qty : 1;
+
+  productBody.innerHTML = `
+    <div class="pm-img">
+      ${p.tag ? `<span class="pm-tag">${p.tag}</span>` : ""}
+      ${p.image ? `<img src="${p.image}" alt="${p.name}">` : p.emoji}
+    </div>
+    <div class="pm-body">
+      <div>
+        <div class="pm-name">${p.name}</div>
+        <div class="pm-unit">${p.unit}</div>
+      </div>
+      <div class="pm-price">${fmt(p.price)}</div>
+      <p class="pm-desc">${p.desc || "Quality product, freshly sourced and ready for delivery."}</p>
+      <div class="pm-meta">
+        <span class="pill">Category: ${p.cat}</span>
+        <span class="pill">Unit: ${p.unit}</span>
+      </div>
+      <div class="pm-actions">
+        <div class="qty">
+          <button id="pmDec" aria-label="Decrease">−</button>
+          <input id="pmQty" class="qty-input" type="number" min="1" max="999" value="${qty}" aria-label="Quantity" />
+          <button id="pmInc" aria-label="Increase">+</button>
+        </div>
+        <button class="btn btn-primary" id="pmAdd">Add to cart</button>
+      </div>
+    </div>
+  `;
+  productOverlay.classList.add("open");
+  productOverlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("no-scroll");
+
+  const qtyInp = document.getElementById("pmQty");
+  document.getElementById("pmInc").onclick = () => { qtyInp.value = Math.min(999, (+qtyInp.value||0)+1); };
+  document.getElementById("pmDec").onclick = () => { qtyInp.value = Math.max(1, (+qtyInp.value||1)-1); };
+  document.getElementById("pmAdd").onclick = () => {
+    const q = Math.max(1, parseInt(qtyInp.value, 10) || 1);
+    if (inCart) setQty(id, q); else addToCart(id, q);
+    closeProductModal();
+  };
+}
+function closeProductModal(){
+  productOverlay.classList.remove("open");
+  productOverlay.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("no-scroll");
+}
+document.getElementById("closeProduct").onclick = closeProductModal;
+productOverlay.addEventListener("click", (e) => { if (e.target === productOverlay) closeProductModal(); });
+
+// === CART DRAWER ===
+const drawer = document.getElementById("cartDrawer");
+const overlay = document.getElementById("cartOverlay");
+function openCart(){ drawer.classList.add("open"); overlay.classList.add("open"); document.body.classList.add("no-scroll"); }
+function closeCart(){ drawer.classList.remove("open"); overlay.classList.remove("open"); document.body.classList.remove("no-scroll"); }
+document.getElementById("cartBtn").onclick = openCart;
+document.getElementById("closeCart").onclick = closeCart;
+overlay.onclick = closeCart;
+
+// === CHECKOUT MODAL ===
+const checkoutOverlay = document.getElementById("checkoutOverlay");
+const checkoutForm = document.getElementById("checkoutForm");
+const modalTotalEl = document.getElementById("modalTotal");
+const cName = document.getElementById("cName");
+const cPhone = document.getElementById("cPhone");
+const cAddress = document.getElementById("cAddress");
+
+function loadCustomer(){
+  try { const s = JSON.parse(localStorage.getItem(CUSTOMER_KEY));
+    if (s){ cName.value = s.name||""; cPhone.value = s.phone||""; cAddress.value = s.address||""; }
+  } catch {}
+}
+function openCheckout(){
+  if (!cart.length) return;
+  modalTotalEl.textContent = fmt(cartTotal());
+  loadCustomer();
+  checkoutOverlay.classList.add("open");
+  document.body.classList.add("no-scroll");
+  setTimeout(() => cName.focus(), 100);
+}
+function closeCheckout(){ checkoutOverlay.classList.remove("open"); document.body.classList.remove("no-scroll"); }
+document.getElementById("checkoutBtn").onclick = openCheckout;
+document.getElementById("closeCheckout").onclick = closeCheckout;
+checkoutOverlay.addEventListener("click", (e) => { if (e.target === checkoutOverlay) closeCheckout(); });
+
+checkoutForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = cName.value.trim(), phone = cPhone.value.trim(), address = cAddress.value.trim();
+  if (!name || !phone || !address){ showToast("Please fill in all fields"); return; }
+  localStorage.setItem(CUSTOMER_KEY, JSON.stringify({ name, phone, address }));
+  const items = cart.map(c => ({ ...c, ...findProduct(c.id) }));
+  const total = cartTotal();
+  const lines = items.map(i => `- ${i.name} x${i.qty} = ${fmt(i.price * i.qty)}`).join("\n");
+  const message =
+`Hello Lolly Africa, I want to place an order:
+
+${lines}
+
+Total: ${fmt(total)}
+
+Customer details:
+Name: ${name}
+Phone: ${phone}
+Delivery address: ${address}
+
+Please confirm availability and delivery. Thank you!`;
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
+  closeCheckout();
+});
+
+// === TOAST ===
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+// === NAVBAR SCROLL ===
+const navbar = document.getElementById("navbar");
+window.addEventListener("scroll", () => navbar.classList.toggle("scrolled", window.scrollY > 10));
+
+// === INIT ===
+document.getElementById("year").textContent = new Date().getFullYear();
+renderProducts();
+renderCart();
