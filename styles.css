@@ -52,7 +52,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .nav-links a:hover{color:var(--primary)}
 .nav-actions{display:flex;align-items:center;gap:10px}
 .icon-btn,.cart-btn{
-  position:relative;width:44px;height:44px;border-radius:12px;
+  position:relative;width:120px;height:400px;border-radius:12px;
   background:var(--surface);border:1px solid var(--border);
   display:grid;place-items:center;color:var(--text);
   transition:transform .2s,box-shadow .2s,background .2s;
