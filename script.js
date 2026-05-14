@@ -11,7 +11,7 @@ const MIN_ORDER = 5000;
 
 // === PRODUCTS (add `desc` for richer detail view) ===
 const products = [
-  { id: 1,  name: "Aeroplane Basmati Rice", unit: "5kg bag", price: 20000, emoji: "🍚", image:"logo.png", cat: "grains", tag: "Bestseller", desc: "Premium parboiled long-grain rice. Cooks evenly, perfect for jollof, fried rice and party servings." },
+  { id: 1,  name: "Aeroplane Basmati Rice", unit: "5kg bag", price: 20000, emoji: "🍚", image:"IMG_5862.jpeg", cat: "grains", tag: "Bestseller", desc: "Premium parboiled long-grain rice. Cooks evenly, perfect for jollof, fried rice and party servings." },
   { id: 2,  name: "Aeroplane Basmati Rice",       unit: "1kg",     price: 4500,  emoji: "🫘", cat: "grains", tag: "New", desc: "Sweet brown beans, hand-cleaned and ready to cook. Great for moi moi, akara and porridge." },
   { id: 3,  name: "Aani Basmati Rice",             unit: "5kg",  price: 23000,  emoji: "🥣", cat: "grains", desc: "Authentic Ijebu garri — sour, fine and crunchy. Perfect for soaking or eba." },
   { id: 4,  name: "Khumbs Golden Sella Pure Basmati Rice",            unit: "5kg",  price: 24000,  emoji: "🥣", cat: "grains", desc: "Smooth yellow garri made from fresh cassava. Ideal for eba and snacks." },
